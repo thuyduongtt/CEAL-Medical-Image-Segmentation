@@ -39,13 +39,15 @@ def create_train_data():
     imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
     imgs_mask = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
 
-    for image_name in images:
+    for i in range(len(images)):
+        image_name = images[i]
         img = cv2.imread(os.path.join(DATA_PATH, image_name), cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
         img = np.array([img])
         imgs[i] = img
 
-    for image_mask_name in masks:
+    for i in range(len(masks)):
+        image_mask_name = masks[i]
         img_mask = cv2.imread(os.path.join(MASKS_PATH, image_mask_name), cv2.IMREAD_GRAYSCALE)
         img_mask = cv2.resize(img_mask, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
         img_mask = np.array([img_mask])
