@@ -9,7 +9,7 @@ from keras.optimizers import Adam
 
 from constants import img_rows, img_cols
 
-K.set_image_dim_ordering('th')  # Theano dimension ordering in this code
+K.set_image_data_format('channels_first') # Theano dimension ordering in this code
 
 smooth = 1.
 
