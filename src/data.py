@@ -8,6 +8,9 @@ import cv2
 
 from constants import *
 
+DATA_PATH = '../../data/train'
+MASKS_PATH = '../../data/masks'
+
 
 def preprocessor(input_img):
     """
@@ -29,21 +32,21 @@ def create_train_data():
     image_rows = 420
     image_cols = 580
 
-    images = os.listdir(data_path)
-    masks = os.listdir(masks_path)
+    images = os.listdir(DATA_PATH)
+    masks = os.listdir(MASKS_PATH)
     total = len(images)
 
     imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
     imgs_mask = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
 
     for image_name in images:
-        img = cv2.imread(os.path.join(data_path, image_name), cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(os.path.join(DATA_PATH, image_name), cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
         img = np.array([img])
         imgs[i] = img
 
     for image_mask_name in masks:
-        img_mask = cv2.imread(os.path.join(masks_path, image_mask_name), cv2.IMREAD_GRAYSCALE)
+        img_mask = cv2.imread(os.path.join(MASKS_PATH, image_mask_name), cv2.IMREAD_GRAYSCALE)
         img_mask = cv2.resize(img_mask, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
         img_mask = np.array([img_mask])
         imgs_mask[i] = img_mask
@@ -58,8 +61,8 @@ def load_train_data():
     :return: [X_train, y_train] numpy arrays containing the training data and their respective masks.
     """
     print("\nLoading train data...\n")
-    X_train = np.load(gzip.open('skin_database/imgs_train.npy.gz'))
-    y_train = np.load(gzip.open('skin_database/imgs_mask_train.npy.gz'))
+    X_train = np.load('../../data/imgs_train.npy')
+    y_train = np.load('../../data/imgs_mask_train.npy')
 
     X_train = preprocessor(X_train)
     y_train = preprocessor(y_train)
