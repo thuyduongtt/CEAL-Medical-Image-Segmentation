@@ -34,15 +34,27 @@ def create_train_data():
 
     images = os.listdir(DATA_PATH)
     masks = os.listdir(MASKS_PATH)
+
+    # clean up .DS_Store file
+    for i in range(len(images)):
+        if images[i].startswith('.'):
+            images.pop(i)
+        if masks[i].startswith('.'):
+            masks.pop(i)
+
     total = len(images)
 
-    imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
-    imgs_mask = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
+    imgs = np.ndarray((total, 1, image_cols, image_rows), dtype=np.uint8)
+    imgs_mask = np.ndarray((total, 1, image_cols, image_rows), dtype=np.uint8)
+
+    print(imgs.shape)
 
     for i in range(len(images)):
         image_name = images[i]
+        print(image_name)
         img = cv2.imread(os.path.join(DATA_PATH, image_name), cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
+        print(img.shape)
         img = np.array([img])
         imgs[i] = img
 
