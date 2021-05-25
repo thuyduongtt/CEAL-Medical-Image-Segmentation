@@ -3,7 +3,7 @@ from __future__ import print_function
 import cv2
 import numpy as np
 from keras import backend as K
-from keras.layers import Input, concatenate, Convolution2D, MaxPooling2D, UpSampling2D, Dropout, Layer
+from keras.layers import Input, concatenate, Convolution2D, MaxPooling2D, UpSampling2D, Dropout, Layer, Conv2DTranspose
 from keras.models import Model
 from keras.optimizers import Adam
 
@@ -79,7 +79,7 @@ def get_unet(dropout):
 
     conv5 = PrintLayer()(conv5, 'conv5')
 
-    up6 = Convolution2D(256, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv5))
+    up6 = Conv2DTranspose(256, 2, 2, padding='same')(conv5)
     merge6 = concatenate([up6, conv4], axis=1)
 
     conv6 = Convolution2D(256, 3, 3, activation='relu', padding='same')(merge6)
@@ -87,7 +87,7 @@ def get_unet(dropout):
 
     conv6 = PrintLayer()(conv6, 'conv6')
 
-    up7 = Convolution2D(128, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv6))
+    up7 = Conv2DTranspose(128, 2, 2, padding='same')(conv6)
     merge7 = concatenate([up7, conv3], axis=1)
 
     conv7 = Convolution2D(128, 3, 3, activation='relu', padding='same')(merge7)
@@ -95,7 +95,7 @@ def get_unet(dropout):
 
     conv7 = PrintLayer()(conv7, 'conv7')
 
-    up8 = Convolution2D(64, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv7))
+    up8 = Conv2DTranspose(64, 2, 2, padding='same')(conv7)
     merge8 = concatenate([up8, conv2], axis=1)
 
     conv8 = Convolution2D(64, 3, 3, activation='relu', padding='same')(merge8)
@@ -103,7 +103,7 @@ def get_unet(dropout):
 
     conv8 = PrintLayer()(conv8, 'conv8')
 
-    up9 = Convolution2D(32, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv8))
+    up9 = Conv2DTranspose(32, 2, 2, padding='same')(conv8)
     merge9 = concatenate([up9, conv1], axis=1)
 
     conv9 = Convolution2D(32, 3, 3, activation='relu', padding='same')(merge9)
