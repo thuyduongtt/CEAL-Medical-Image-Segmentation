@@ -10,4 +10,4 @@ scikit-image
 scikit-learn
 scipy
 six
-tensorflow-gpu
+tensorflow
