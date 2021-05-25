@@ -15,7 +15,7 @@ unlabeled_index = np.arange(nb_labeled, len(X_train))
 
 # (1) Initialize model
 model = get_unet(dropout=True)
-model.load_weights(initial_weights_path)
+# model.load_weights(initial_weights_path)
 
 if initial_train:
     model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
@@ -29,7 +29,7 @@ if initial_train:
             model.save(initial_weights_path)
             log(history, initial_epoch, log_file)
     else:
-        history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=32, nb_epoch=nb_initial_epochs,
+        history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=32, epochs=nb_initial_epochs,
                             verbose=1, shuffle=True, callbacks=[model_checkpoint])
 
         log(history, 0, log_file)
