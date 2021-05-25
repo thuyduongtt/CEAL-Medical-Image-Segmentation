@@ -32,41 +32,40 @@ def create_train_data():
     image_rows = 420
     image_cols = 580
 
-    images = os.listdir(DATA_PATH)
-    masks = os.listdir(MASKS_PATH)
+    images_list = os.listdir(DATA_PATH)
+    masks_list = os.listdir(MASKS_PATH)
+
+    images = []
+    masks = []
 
     # clean up .DS_Store file
-    for i in range(len(images)):
-        if images[i].startswith('.'):
-            images.pop(i)
-        if masks[i].startswith('.'):
-            masks.pop(i)
+    for i in range(len(images_list)):
+        if not images_list[i].startswith('.'):
+            images.append(images_list[i])
+        if not masks_list[i].startswith('.'):
+            masks.append(masks_list[i])
 
     total = len(images)
 
-    imgs = np.ndarray((total, 1, image_cols, image_rows), dtype=np.uint8)
-    imgs_mask = np.ndarray((total, 1, image_cols, image_rows), dtype=np.uint8)
-
-    print(imgs.shape)
+    imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
+    imgs_mask = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
 
     for i in range(len(images)):
         image_name = images[i]
-        print(image_name)
         img = cv2.imread(os.path.join(DATA_PATH, image_name), cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
-        print(img.shape)
-        img = np.array([img])
+        img = np.array([img.T])
         imgs[i] = img
 
     for i in range(len(masks)):
         image_mask_name = masks[i]
         img_mask = cv2.imread(os.path.join(MASKS_PATH, image_mask_name), cv2.IMREAD_GRAYSCALE)
         img_mask = cv2.resize(img_mask, (image_rows, image_cols), interpolation=cv2.INTER_CUBIC)
-        img_mask = np.array([img_mask])
+        img_mask = np.array([img_mask.T])
         imgs_mask[i] = img_mask
 
-    np.save('imgs_train.npy', imgs)
-    np.save('imgs_mask_train.npy', imgs_mask)
+    np.save('../../data/imgs_train.npy', imgs)
+    np.save('../../data/imgs_mask_train.npy', imgs_mask)
 
 
 def load_train_data():

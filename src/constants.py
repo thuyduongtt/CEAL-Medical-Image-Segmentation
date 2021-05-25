@@ -1,7 +1,7 @@
 # PATH definition
-global_path = "[global_path_name]"
-initial_weights_path = "models/[initial_weights_name].hdf5"
-final_weights_path = "models/[output_weights_name].hdf5"
+global_path = "output_"
+initial_weights_path = "models/init_weights.hdf5"
+final_weights_path = "models/output_weights.hdf5"
 
 # Data definition
 img_rows = 64 * 3
