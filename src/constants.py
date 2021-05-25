@@ -7,9 +7,9 @@ final_weights_path = "models/output_weights.hdf5"
 img_rows = 64 * 3
 img_cols = 80 * 3
 
-nb_total = 2000
-nb_train = 1600
-nb_labeled = 600
+nb_total = 20
+nb_train = 20
+nb_labeled = 0
 nb_unlabeled = nb_train - nb_labeled
 
 # CEAL parameters

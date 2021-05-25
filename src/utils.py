@@ -33,6 +33,8 @@ def predict(data, model):
     :param model: unet model.
     :return: predictions.
     """
+    if len(data) == 0:
+        return []
     return model.predict(data, verbose=0)
 
 
@@ -244,8 +246,8 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         y_labeled_train = np.concatenate((y_train[labeled_index], predictions[pseudo_index]))
 
     else:
-        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
-        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
+        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), img_rows, img_cols, 1])
+        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), img_rows, img_cols, 1])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
 

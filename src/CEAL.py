@@ -52,7 +52,7 @@ for iteration in range(1, nb_iterations + 1):
                                                                                           unlabeled_index, weights,
                                                                                           iteration)
     # (3) Training
-    history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, nb_epoch=nb_active_epochs, verbose=1,
+    history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
                         shuffle=True, callbacks=[model_checkpoint])
 
     log(history, iteration, log_file)
