@@ -108,6 +108,7 @@ def get_unet(dropout):
 
     conv9 = Convolution2D(32, 3, 3, activation='relu', padding='same')(merge9)
     conv9 = Convolution2D(32, 3, 3, activation='relu', padding='same')(conv9)
+    # conv9 = Convolution2D(2, 3, 3, activation='relu', padding='same')(conv9)
 
     conv9 = PrintLayer()(conv9, 'conv9')
 
