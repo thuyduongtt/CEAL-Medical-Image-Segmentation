@@ -35,7 +35,7 @@ def call(self, inputs, training=None):
             return K.dropout(inputs, self.rate, noise_shape,
                              seed=self.seed)
 
-        if (training):
+        if training:
             return K.in_train_phase(dropped_inputs, inputs, training=training)
         else:
             return K.in_test_phase(dropped_inputs, inputs, training=None)
@@ -79,30 +79,34 @@ def get_unet(dropout):
 
     conv5 = PrintLayer()(conv5, 'conv5')
 
-    up6 = concatenate([UpSampling2D(size=(2, 2))(conv5), UpSampling2D(size=(2, 2))(conv4)], axis=1)
+    up6 = Convolution2D(256, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv5))
+    merge6 = concatenate([up6, conv4], axis=1)
 
-    conv6 = Convolution2D(256, 3, 3, activation='relu', padding='same')(up6)
+    conv6 = Convolution2D(256, 3, 3, activation='relu', padding='same')(merge6)
     conv6 = Convolution2D(256, 3, 3, activation='relu', padding='same')(conv6)
 
     conv6 = PrintLayer()(conv6, 'conv6')
 
-    up7 = concatenate([UpSampling2D(size=(2, 2))(conv6), UpSampling2D(size=(2, 2))(conv3)], axis=1)
+    up7 = Convolution2D(128, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv6))
+    merge7 = concatenate([up7, conv3], axis=1)
 
-    conv7 = Convolution2D(128, 3, 3, activation='relu', padding='same')(up7)
+    conv7 = Convolution2D(128, 3, 3, activation='relu', padding='same')(merge7)
     conv7 = Convolution2D(128, 3, 3, activation='relu', padding='same')(conv7)
 
     conv7 = PrintLayer()(conv7, 'conv7')
 
-    up8 = concatenate([UpSampling2D(size=(2, 2))(conv7), conv2], axis=1)
+    up8 = Convolution2D(64, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv7))
+    merge8 = concatenate([up8, conv2], axis=1)
 
-    conv8 = Convolution2D(64, 3, 3, activation='relu', padding='same')(up8)
+    conv8 = Convolution2D(64, 3, 3, activation='relu', padding='same')(merge8)
     conv8 = Convolution2D(64, 3, 3, activation='relu', padding='same')(conv8)
 
     conv8 = PrintLayer()(conv8, 'conv8')
 
-    up9 = concatenate([UpSampling2D(size=(2, 2))(conv8), conv1], axis=1)
+    up9 = Convolution2D(32, 2, 2, activation='relu', padding='same')(UpSampling2D(size=(2, 2))(conv8))
+    merge9 = concatenate([up9, conv1], axis=1)
 
-    conv9 = Convolution2D(32, 3, 3, activation='relu', padding='same')(up9)
+    conv9 = Convolution2D(32, 3, 3, activation='relu', padding='same')(merge9)
     conv9 = Convolution2D(32, 3, 3, activation='relu', padding='same')(conv9)
 
     conv9 = PrintLayer()(conv9, 'conv9')
