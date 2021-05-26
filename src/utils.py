@@ -33,8 +33,6 @@ def predict(data, model):
     :param model: unet model.
     :return: predictions.
     """
-    if len(data) == 0:
-        return []
     return model.predict(data, verbose=0)
 
 
@@ -194,6 +192,10 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
     """
     print("\nActive iteration " + str(iteration))
     print("-" * 50 + "\n")
+
+    if len(unlabeled_index) == 0:
+        print('No unlabeled sample left. Finishing...')
+        return None
 
     # load models
     modelUncertain = get_unet(dropout=True)

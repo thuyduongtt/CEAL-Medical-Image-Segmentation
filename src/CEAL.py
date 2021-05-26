@@ -47,15 +47,15 @@ for iteration in range(1, nb_iterations + 1):
         weights = final_weights_path
 
     # (2) Labeling
-    X_labeled_train, y_labeled_train, labeled_index, unlabeled_index = compute_train_sets(X_train, y_train,
-                                                                                          labeled_index,
-                                                                                          unlabeled_index, weights,
-                                                                                          iteration)
-    # (3) Training
-    history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
-                        shuffle=True, callbacks=[model_checkpoint])
+    computed_sets = compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights, iteration)
+    if computed_sets is not None:
+        X_labeled_train, y_labeled_train, labeled_index, unlabeled_index = computed_sets
 
-    log(history, iteration, log_file)
-    model.save(global_path + "models/active_model" + str(iteration) + ".h5")
+        # (3) Training
+        history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
+                            shuffle=True, callbacks=[model_checkpoint])
+
+        log(history, iteration, log_file)
+        model.save(global_path + "models/active_model" + str(iteration) + ".h5")
 
 log_file.close()
