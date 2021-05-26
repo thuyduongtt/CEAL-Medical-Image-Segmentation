@@ -18,7 +18,7 @@ def preprocessor(input_img):
     :param input_img: numpy array of images
     :return: numpy array of preprocessed images
     """
-    output_img = np.ndarray((input_img.shape[0], img_rows, img_cols, input_img.shape[-1]), dtype=np.uint8)
+    output_img = np.ndarray((input_img.shape[0], input_img.shape[1], img_rows, img_cols), dtype=np.uint8)
     for i in range(input_img.shape[0]):
         # reshaped = input_img[i].reshape(input_img.shape[-1], input_img.shape[1], input_img.shape[2])
         # processed = cv2.resize(reshaped[0], (img_cols, img_rows), interpolation=cv2.INTER_CUBIC)

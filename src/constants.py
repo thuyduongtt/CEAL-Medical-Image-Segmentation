@@ -9,7 +9,7 @@ img_cols = 80 * 3
 
 nb_total = 20
 nb_train = 20
-nb_labeled = 0
+nb_labeled = 2
 nb_unlabeled = nb_train - nb_labeled
 
 # CEAL parameters
