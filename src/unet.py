@@ -1,10 +1,8 @@
 from __future__ import print_function
 
-import cv2
-import numpy as np
 from keras import backend as K
-from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, MaxPool2D, UpSampling2D, Dropout, SpatialDropout2D, Layer, \
-    Conv2DTranspose, BatchNormalization, Cropping2D, Concatenate
+from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, MaxPool2D, UpSampling2D, Dropout, Layer, \
+    Concatenate
 from keras.models import Model
 from keras.optimizers import Adam
 
@@ -46,9 +44,7 @@ def call(self, inputs, training=None):
 Dropout.call = call
 
 
-def get_unet(dropout):
-    return custom_unet()
-
+def get_unet_old(dropout):
     inputs = Input((1, img_rows, img_cols))
     inputs = PrintLayer()(inputs, 'inputs')  # (None, 1, 192, 240)
 
@@ -144,8 +140,8 @@ def get_unet(dropout):
     return model
 
 
-def custom_unet():
-    filters = 64
+def get_unet(dropout):
+    filters = 32
     input_layer = Input(shape=[1, img_rows, img_cols])
     layers = [input_layer]
     residuals = []
@@ -177,6 +173,9 @@ def custom_unet():
     # Down 5, 8
     d5 = down(d4, filters, pool=False)
 
+    if dropout:
+        d5 = Dropout(0.5)(d5)
+
     # Up 1, 16
     up1 = up(d5, residual=residuals[-1], filters=filters / 2)
 
@@ -199,6 +198,8 @@ def custom_unet():
 
     model = Model(input_layer, out)
     model.compile(optimizer=Adam(learning_rate=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
+
+    model.summary()
 
     return model
 
