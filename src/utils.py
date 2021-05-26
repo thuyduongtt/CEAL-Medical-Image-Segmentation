@@ -234,7 +234,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
 
     labeled_index = np.concatenate((labeled_index, oracle_rank))
 
-    if (iteration >= pseudo_epoch):
+    if iteration >= pseudo_epoch:
 
         pseudo_index = get_pseudo_index(uncertain, nb_pseudo_initial + (pseudo_rate * (iteration - pseudo_epoch)))
         pseudo_rank = unlabeled_index[pseudo_index]
@@ -246,8 +246,8 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         y_labeled_train = np.concatenate((y_train[labeled_index], predictions[pseudo_index]))
 
     else:
-        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), img_rows, img_cols, 1])
-        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), img_rows, img_cols, 1])
+        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
+        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
 

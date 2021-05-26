@@ -11,7 +11,7 @@ from keras.optimizers import Adam
 from constants import img_rows, img_cols
 
 # K.set_image_dim_ordering('th') # Theano dimension ordering in this code
-# K.set_image_data_format('channels_first')
+K.set_image_data_format('channels_first')
 
 smooth = 1.
 
@@ -146,7 +146,7 @@ def get_unet(dropout):
 
 def custom_unet():
     filters = 64
-    input_layer = Input(shape=[img_rows, img_cols, 1])
+    input_layer = Input(shape=[1, img_rows, img_cols])
     layers = [input_layer]
     residuals = []
 
@@ -217,7 +217,7 @@ def up(input_layer, residual, filters):
     filters = int(filters)
     upsample = UpSampling2D()(input_layer)
     upconv = Conv2D(filters, kernel_size=(2, 2), padding="same")(upsample)
-    concat = Concatenate(axis=3)([residual, upconv])
+    concat = Concatenate(axis=1)([residual, upconv])
     conv1 = Conv2D(filters, (3, 3), padding='same', activation='relu')(concat)
     conv2 = Conv2D(filters, (3, 3), padding='same', activation='relu')(conv1)
     return conv2
