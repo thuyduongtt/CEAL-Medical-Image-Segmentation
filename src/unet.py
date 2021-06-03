@@ -140,9 +140,9 @@ def get_unet_old(dropout):
     return model
 
 
-def get_unet(dropout):
+def get_unet(dropout, n_channel=1):
     filters = 32
-    input_layer = Input(shape=[1, img_rows, img_cols])
+    input_layer = Input(shape=[n_channel, img_rows, img_cols])
     layers = [input_layer]
     residuals = []
 
