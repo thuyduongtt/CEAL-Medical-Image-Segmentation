@@ -8,8 +8,7 @@ from pathlib import Path
 
 from constants import *
 
-DATA_PATH = '../../data/train'
-MASKS_PATH = '../../data/masks'
+DATA_PATH = '../../data/QB/'
 
 
 def preprocessor(input_img):
@@ -43,20 +42,38 @@ def create_train_data():
     images = []
     masks = []
 
-    for region in Path(DATA_PATH, input_dir_1).iterdir():
-        for patch in region.iterdir():
-            img1 = cv2.imread(patch)
-            print(img1.shape)
-            img2 = cv2.imread(Path(DATA_PATH, input_dir_2, region.stem, patch.name))
-            print(img2.shape)
-            # images.append(img)
-            # masks.append(Path(DATA_PATH, label_dir, region.stem, patch.name))
+    def open_patch(root, patch, path):
+        img1 = cv2.imread(str(patch))
+        img2 = cv2.imread(str(Path(root, input_dir_2, path)))
+        img = np.concatenate((img1, img2), axis=-1)
+        img = img.reshape(n_channel, image_rows, image_cols)
+        images.append(img)
 
-    # print(images.shape)
-    # print(masks.shape)
-    #
-    # np.save('../../data/imgs_train.npy', images)
-    # np.save('../../data/imgs_mask_train.npy', masks)
+        mask = cv2.imread(str(Path(root, label_dir, path)), cv2.IMREAD_GRAYSCALE)
+        mask = mask.reshape(1, image_rows, image_cols)
+        masks.append(mask)
+
+    def open_set(set_name):
+        root = DATA_PATH + set_name
+        for regionOrPatch in Path(root, input_dir_1).iterdir():
+            if regionOrPatch.is_dir():
+                for patch in regionOrPatch.iterdir():
+                    open_patch(root, patch, Path(regionOrPatch.stem, patch.name))
+            else:
+                open_patch(root, regionOrPatch, regionOrPatch.name)
+
+    open_set('train')
+    open_set('test')
+    open_set('val')
+
+    images = np.asarray(images)
+    masks = np.asarray(masks)
+
+    print(images.shape)
+    print(masks.shape)
+
+    np.save('../../data/imgs_train.npy', images)
+    np.save('../../data/imgs_mask_train.npy', masks)
 
 
 def load_train_data():

@@ -199,7 +199,7 @@ def get_unet(dropout, n_channel=1):
     model = Model(input_layer, out)
     model.compile(optimizer=Adam(learning_rate=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
 
-    model.summary()
+    # model.summary()
 
     return model
 

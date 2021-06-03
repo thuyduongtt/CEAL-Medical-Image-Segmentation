@@ -4,12 +4,14 @@ initial_weights_path = "models/init_weights.hdf5"
 final_weights_path = "models/output_weights.hdf5"
 
 # Data definition
-img_rows = 64 * 3
-img_cols = 80 * 3
+# img_rows = 64 * 3
+# img_cols = 80 * 3
+img_rows = 256
+img_cols = 256
 
-nb_total = 20
-nb_train = 20
-nb_labeled = 2
+nb_total = 1411
+nb_train = 1350
+nb_labeled = 270
 nb_unlabeled = nb_train - nb_labeled
 
 # CEAL parameters
