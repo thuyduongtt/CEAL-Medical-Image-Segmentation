@@ -249,7 +249,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
 
     else:
         X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), n_channel, img_rows, img_cols])
-        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), n_channel, img_rows, img_cols])
+        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
 
