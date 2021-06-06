@@ -14,7 +14,7 @@ labeled_index = np.arange(0, nb_labeled)
 unlabeled_index = np.arange(nb_labeled, len(X_train))
 
 # (1) Initialize model
-model = get_unet(dropout=True, n_channel=6)
+model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
 if initial_train:

@@ -6,7 +6,7 @@ from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, MaxPool2D, Up
 from keras.models import Model
 from keras.optimizers import Adam
 
-from constants import img_rows, img_cols
+from constants import img_rows, img_cols, n_channel
 
 # K.set_image_dim_ordering('th') # Theano dimension ordering in this code
 K.set_image_data_format('channels_first')
@@ -140,7 +140,7 @@ def get_unet_old(dropout):
     return model
 
 
-def get_unet(dropout, n_channel=1):
+def get_unet(dropout):
     filters = 32
     input_layer = Input(shape=[n_channel, img_rows, img_cols])
     layers = [input_layer]
