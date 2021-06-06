@@ -33,7 +33,6 @@ def create_train_data():
 
     image_rows = 256
     image_cols = 256
-    n_channel = 6
 
     input_dir_1 = 'input1'
     input_dir_2 = 'input2'

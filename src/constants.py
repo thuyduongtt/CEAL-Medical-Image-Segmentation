@@ -8,6 +8,7 @@ final_weights_path = "models/output_weights.hdf5"
 # img_cols = 80 * 3
 img_rows = 256
 img_cols = 256
+n_channel = 6
 
 nb_total = 1411
 nb_train = 1350

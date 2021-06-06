@@ -216,7 +216,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         if index % 100 == 0:
             print("completed: " + str(index) + "/" + str(len(unlabeled_index)))
 
-        sample = X_train[unlabeled_index[index]].reshape([1, 1, img_rows, img_cols])
+        sample = X_train[unlabeled_index[index]].reshape([1, n_channel, img_rows, img_cols])
 
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
 
@@ -248,8 +248,8 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         y_labeled_train = np.concatenate((y_train[labeled_index], predictions[pseudo_index]))
 
     else:
-        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
-        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
+        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), n_channel, img_rows, img_cols])
+        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), n_channel, img_rows, img_cols])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
 
