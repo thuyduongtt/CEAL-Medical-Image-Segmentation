@@ -4,7 +4,7 @@ from keras import backend as K
 from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, MaxPool2D, UpSampling2D, Dropout, Layer, \
     Concatenate
 from keras.models import Model
-from keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam
 
 from constants import img_rows, img_cols, n_channel
 
