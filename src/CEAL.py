@@ -5,7 +5,7 @@ import numpy as np
 
 from data2 import load_data
 from utils import *
-from metrics import validate
+from metrics import validate, test
 
 create_paths()
 log_file = open(global_path + "logs/log_file.txt", 'a')
@@ -72,3 +72,5 @@ for iteration in range(1, nb_iterations + 1):
     validate(model, X_val, y_val, iteration, n_samples, n_labeled_used)
 
 log_file.close()
+
+test(model)

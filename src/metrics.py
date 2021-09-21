@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
 import cv2
+from data2 import load_data
 
 from constants import img_rows, img_cols, global_path
 
@@ -11,7 +12,7 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     # print(f'y_val: {y_val.shape}')  # (30, 1, 256, 256)
     # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
     metrics = {}
-    for index in range(predictions.shape[0]):
+    for index in range(len(X_val)):
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
         # print(sample_prediction.shape)  # (1, 256, 256)
         sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
@@ -23,17 +24,45 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     for k in metrics:
         metrics[k] = np.asarray(metrics[k]).mean()
 
-    with open(global_path + "logs/metrics.txt", 'a') as metrics_file:
-        print(f'========================= Active Iteration {iteration}\n', file=metrics_file)
-        print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%',
-              file=metrics_file)
-        print(metrics, file=metrics_file)
+    with open(global_path + "logs/metrics.txt", 'a') as f:
+        print(f'========================= Active Iteration {iteration}', file=f)
+        print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
+        print(metrics, file=f)
+        print('\n\n')
+
+
+def test(model):
+    X_test, y_test = load_data('test')
+
+    predictions = model.predict(X_test)
+    metrics = {}
+    for index in range(len(X_test)):
+        sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        # print(sample_prediction.shape)  # (1, 256, 256)
+        sample_true = cv2.threshold(y_test[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+
+        cv2.imwrite(f'{index}_pred.bmp', sample_prediction)
+        cv2.imwrite(f'{index}_true.bmp', sample_true)
+
+        sample_metrics = compute_metrics(sample_true, sample_prediction)
+        for k in sample_metrics:
+            if k not in metrics:
+                metrics[k] = []
+            metrics[k].append(sample_metrics[k])
+    for k in metrics:
+        metrics[k] = np.asarray(metrics[k]).mean()
+
+    with open(global_path + "logs/test.txt", 'a') as f:
+        print(metrics, file=f)
 
 
 def compute_metrics(y_true, y_pred):
     smooth = 1.  # smoothing value to deal zero denominators.
     y_true_f = y_true.reshape([1, img_rows * img_cols])
     y_pred_f = y_pred.reshape([1, img_rows * img_cols])
+
+    # print(np.unique(y_true_f))
+    # print(np.unique(y_pred_f))
 
     tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
 
