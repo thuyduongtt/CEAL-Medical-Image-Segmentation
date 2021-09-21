@@ -72,8 +72,9 @@ for iteration in range(1, nb_iterations + 1):
     metrics = {}
     for index in range(predictions.shape[0]):
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
-        print(sample_prediction.shape)
-        sample_metrics = compute_metrics(y_val[index], sample_prediction)
+        # print(sample_prediction.shape)  # (1, 256, 256)
+        sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        sample_metrics = compute_metrics(sample_true, sample_prediction)
         for k in sample_metrics:
             if k not in metrics:
                 metrics[k] = []

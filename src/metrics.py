@@ -9,8 +9,8 @@ def compute_metrics(y_true, y_pred):
     y_true_f = y_true.reshape([1, img_rows * img_cols])
     y_pred_f = y_pred.reshape([1, img_rows * img_cols])
 
-    print(y_true_f.unique())
-    print(y_pred_f.unique())
+    print(np.unique(y_true_f))
+    print(np.unique(y_pred_f))
 
     tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
 
@@ -46,7 +46,4 @@ def compute_metrics(y_true, y_pred):
 
 
 def check_nan(t):
-    isnan = np.isnan(t)
-    if isnan.any():
-        t[isnan == 1] = 0
-    return t
+    return 0 if np.isnan(t) else t

@@ -49,7 +49,6 @@ def create_train_data(split='train'):
         images.append(img)
 
         mask = cv2.imread(str(Path(root, label_dir, path)), cv2.IMREAD_GRAYSCALE)
-        mask = cv2.threshold(mask, 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
         mask = mask.reshape(1, image_rows, image_cols)
         masks.append(mask)
 
@@ -69,6 +68,10 @@ def create_train_data(split='train'):
 
     print(images.shape)
     print(masks.shape)
+
+    # reduce num of samples for debugging
+    # images = images[:30]
+    # masks = masks[:30]
 
     np.save(f'../../data/imgs_{split}.npy', images)
     np.save(f'../../data/imgs_mask_{split}.npy', masks)
