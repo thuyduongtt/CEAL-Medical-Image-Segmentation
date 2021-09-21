@@ -16,6 +16,10 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
         # print(sample_prediction.shape)  # (1, 256, 256)
         sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+
+        cv2.imwrite(f'val_{iteration}_{index}_pred.bmp', sample_prediction)
+        cv2.imwrite(f'val_{iteration}_{index}_true.bmp', sample_true)
+
         sample_metrics = compute_metrics(sample_true, sample_prediction)
         for k in sample_metrics:
             if k not in metrics:
@@ -41,8 +45,8 @@ def test(model):
         # print(sample_prediction.shape)  # (1, 256, 256)
         sample_true = cv2.threshold(y_test[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
 
-        cv2.imwrite(f'{index}_pred.bmp', sample_prediction)
-        cv2.imwrite(f'{index}_true.bmp', sample_true)
+        cv2.imwrite(f'test_{index}_pred.bmp', sample_prediction)
+        cv2.imwrite(f'test_{index}_true.bmp', sample_true)
 
         sample_metrics = compute_metrics(sample_true, sample_prediction)
         for k in sample_metrics:
