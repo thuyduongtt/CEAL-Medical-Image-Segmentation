@@ -1,13 +1,16 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
 
-from src.constants import img_rows, img_cols
+from constants import img_rows, img_cols
 
 
 def compute_metrics(y_true, y_pred):
     smooth = 1.  # smoothing value to deal zero denominators.
     y_true_f = y_true.reshape([1, img_rows * img_cols])
     y_pred_f = y_pred.reshape([1, img_rows * img_cols])
+
+    print(y_true_f.unique())
+    print(y_pred_f.unique())
 
     tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
 
