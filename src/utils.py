@@ -294,6 +294,7 @@ def create_paths():
     path_logs = global_path + "logs/"
     path_plots = global_path + "plots/"
     path_models = global_path + "models/"
+    path_results = global_path + "results/"
 
     if not os.path.exists(path_ranks):
         os.makedirs(path_ranks)
@@ -310,3 +311,7 @@ def create_paths():
     if not os.path.exists(path_models):
         os.makedirs(path_models)
         print("Path created: ", path_models)
+
+    if not os.path.exists(path_results):
+        os.makedirs(path_results)
+        print("Path created: ", path_results)

@@ -17,8 +17,8 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
         # print(sample_prediction.shape)  # (1, 256, 256)
         sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
 
-        cv2.imwrite(f'val_{iteration}_{index}_pred.bmp', sample_prediction)
-        cv2.imwrite(f'val_{iteration}_{index}_true.bmp', sample_true)
+        save_img(f'val_{iteration}_{index}_pred.png', sample_prediction)
+        save_img(f'val_{iteration}_{index}_true.png', sample_true)
 
         sample_metrics = compute_metrics(sample_true, sample_prediction)
         for k in sample_metrics:
@@ -28,7 +28,7 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     for k in metrics:
         metrics[k] = np.asarray(metrics[k]).mean()
 
-    with open(global_path + "logs/metrics.txt", 'a') as f:
+    with open(global_path + "results/metrics.txt", 'a') as f:
         print(f'========================= Active Iteration {iteration}', file=f)
         print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
         print(metrics, file=f)
@@ -45,8 +45,8 @@ def test(model):
         # print(sample_prediction.shape)  # (1, 256, 256)
         sample_true = cv2.threshold(y_test[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
 
-        cv2.imwrite(f'test_{index}_pred.bmp', sample_prediction)
-        cv2.imwrite(f'test_{index}_true.bmp', sample_true)
+        save_img(f'test_{index}_pred.png', sample_prediction)
+        save_img(f'test_{index}_true.png', sample_true)
 
         sample_metrics = compute_metrics(sample_true, sample_prediction)
         for k in sample_metrics:
@@ -56,7 +56,7 @@ def test(model):
     for k in metrics:
         metrics[k] = np.asarray(metrics[k]).mean()
 
-    with open(global_path + "logs/test.txt", 'a') as f:
+    with open(global_path + "results/test.txt", 'a') as f:
         print(metrics, file=f)
 
 
@@ -103,3 +103,9 @@ def compute_metrics(y_true, y_pred):
 
 def check_nan(t):
     return 0 if np.isnan(t) else t
+
+
+def save_img(name, im):
+    c, w, h = im.shape
+    img = im.reshape(w, h, c)
+    cv2.imwrite(f'results/{name}', img)
