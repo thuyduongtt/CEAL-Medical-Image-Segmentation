@@ -26,7 +26,7 @@ def preprocessor(input_img):
     return output_img
 
 
-def create_train_data():
+def create_train_data(split='train'):
     """
     Generate training data numpy arrays and save them into the project path
     """
@@ -61,9 +61,7 @@ def create_train_data():
             else:
                 open_patch(root, regionOrPatch, regionOrPatch.name)
 
-    open_set('train')
-    open_set('test')
-    open_set('val')
+    open_set(split)
 
     images = np.asarray(images)
     masks = np.asarray(masks)
@@ -71,18 +69,18 @@ def create_train_data():
     print(images.shape)
     print(masks.shape)
 
-    np.save('../../data/imgs_train.npy', images)
-    np.save('../../data/imgs_mask_train.npy', masks)
+    np.save(f'../../data/imgs_{split}.npy', images)
+    np.save(f'../../data/imgs_mask_{split}.npy', masks)
 
 
-def load_train_data():
+def load_data(split='train'):
     """
     Load training data from project path
     :return: [X_train, y_train] numpy arrays containing the training data and their respective masks.
     """
-    print("\nLoading train data...\n")
-    X_train = np.load('../../data/imgs_train.npy')
-    y_train = np.load('../../data/imgs_mask_train.npy')
+    print(f"\nLoading {split} data...\n")
+    X_train = np.load(f'../../data/imgs_{split}.npy')
+    y_train = np.load(f'../../data/imgs_mask_{split}.npy')
 
     X_train = preprocessor(X_train)
     y_train = preprocessor(y_train)
@@ -101,4 +99,6 @@ def load_train_data():
 
 
 if __name__ == '__main__':
-    create_train_data()
+    create_train_data('train')
+    create_train_data('val')
+    create_train_data('test')

@@ -1,17 +1,22 @@
 from __future__ import print_function
 
 from keras.callbacks import ModelCheckpoint
+import cv2
+import numpy as np
 
-from data import load_train_data
+from data2 import load_data
 from utils import *
+from metrics import compute_metrics
 
 create_paths()
 log_file = open(global_path + "logs/log_file.txt", 'a')
 
 # CEAL data definition
-X_train, y_train = load_train_data()
+X_train, y_train = load_data('train')
 labeled_index = np.arange(0, nb_labeled)
 unlabeled_index = np.arange(nb_labeled, len(X_train))
+
+X_val, y_val = load_data('val')
 
 # (1) Initialize model
 model = get_unet(dropout=True)
@@ -58,5 +63,24 @@ for iteration in range(1, nb_iterations + 1):
 
     log(history, iteration, log_file)
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
+
+    # validate
+    predictions = model.predict(X_val)
+    print(f'X_val: {X_val.shape}')
+    print(f'y_val: {y_val.shape}')
+    print(f'Predictions: {predictions.shape}')
+    metrics = {}
+    for index in range(predictions.shape[0]):
+        sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        sample_metrics = compute_metrics(y_val[index][0], sample_prediction)
+        for k in sample_metrics:
+            if k not in metrics:
+                metrics[k] = []
+            metrics[k].append(sample_metrics[k])
+    print(metrics)
+    for k in metrics:
+        metrics[k] = np.asarray(metrics[k]).mean()
+    print(metrics)
+
 
 log_file.close()

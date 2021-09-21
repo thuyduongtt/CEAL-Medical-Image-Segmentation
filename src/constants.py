@@ -10,14 +10,16 @@ img_rows = 256
 img_cols = 256
 n_channel = 6
 
-nb_total = 1411
-nb_train = 1350
+# nb_total = 1411
+# nb_train = 1350
 nb_labeled = 270
-nb_unlabeled = nb_train - nb_labeled
+# nb_unlabeled = nb_train - nb_labeled
 
 # CEAL parameters
 apply_edt = True
-nb_iterations = 10
+nb_iterations = 35
+# each iteration num of unlabeled samples is reduced by 31
+# just set to a big number, program will stop when there's no unlabeled samples left
 
 nb_step_predictions = 20
 
@@ -26,7 +28,7 @@ nb_random = 15
 nb_most_uncertain = 10
 most_uncertain_rate = 5
 
-pseudo_epoch = 5
+pseudo_epoch = 5  # after a few first epochs, we start using pseudo labels
 nb_pseudo_initial = 20
 pseudo_rate = 20
 

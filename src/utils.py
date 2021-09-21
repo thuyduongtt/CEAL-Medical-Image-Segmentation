@@ -234,7 +234,10 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
     np.save(global_path + "ranks/oracle" + str(iteration), oracle_rank)
     np.save(global_path + "ranks/oraclelogs" + str(iteration), oracle_index)
 
+    total = len(labeled_index) + len(unlabeled_index)
     labeled_index = np.concatenate((labeled_index, oracle_rank))
+
+    print(f'Oracle size: {len(oracle_index)} / {total} ===> {len(oracle_index) / total * 100:.0f}%')
 
     if iteration >= pseudo_epoch:
 
@@ -247,8 +250,11 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         X_labeled_train = np.concatenate((X_train[labeled_index], X_train[pseudo_index]))
         y_labeled_train = np.concatenate((y_train[labeled_index], predictions[pseudo_index]))
 
+        print(f'Pseudo size: {len(pseudo_index)}')
+
     else:
-        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), n_channel, img_rows, img_cols])
+        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape(
+            [len(labeled_index), n_channel, img_rows, img_cols])
         y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
