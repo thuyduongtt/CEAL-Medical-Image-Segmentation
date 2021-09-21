@@ -1,16 +1,39 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
+import cv2
 
-from constants import img_rows, img_cols
+from constants import img_rows, img_cols, global_path
+
+
+def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
+    predictions = model.predict(X_val)
+    # print(f'X_val: {X_val.shape}')  # (30, 6, 256, 256)
+    # print(f'y_val: {y_val.shape}')  # (30, 1, 256, 256)
+    # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
+    metrics = {}
+    for index in range(predictions.shape[0]):
+        sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        # print(sample_prediction.shape)  # (1, 256, 256)
+        sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        sample_metrics = compute_metrics(sample_true, sample_prediction)
+        for k in sample_metrics:
+            if k not in metrics:
+                metrics[k] = []
+            metrics[k].append(sample_metrics[k])
+    for k in metrics:
+        metrics[k] = np.asarray(metrics[k]).mean()
+
+    with open(global_path + "logs/metrics.txt", 'a') as metrics_file:
+        print(f'========================= Active Iteration {iteration}\n', file=metrics_file)
+        print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%',
+              file=metrics_file)
+        print(metrics, file=metrics_file)
 
 
 def compute_metrics(y_true, y_pred):
     smooth = 1.  # smoothing value to deal zero denominators.
     y_true_f = y_true.reshape([1, img_rows * img_cols])
     y_pred_f = y_pred.reshape([1, img_rows * img_cols])
-
-    print(np.unique(y_true_f))
-    print(np.unique(y_pred_f))
 
     tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
 

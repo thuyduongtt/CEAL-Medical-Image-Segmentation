@@ -234,10 +234,9 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
     np.save(global_path + "ranks/oracle" + str(iteration), oracle_rank)
     np.save(global_path + "ranks/oraclelogs" + str(iteration), oracle_index)
 
-    total = len(labeled_index) + len(unlabeled_index)
     labeled_index = np.concatenate((labeled_index, oracle_rank))
 
-    print(f'Oracle size: {len(oracle_index)} / {total} ===> {len(oracle_index) / total * 100:.0f}%')
+    print(f'Oracle size: {len(oracle_index)}')
 
     if iteration >= pseudo_epoch:
 
@@ -259,7 +258,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
 
-    return X_labeled_train, y_labeled_train, labeled_index, unlabeled_index
+    return X_labeled_train, y_labeled_train, labeled_index, unlabeled_index, len(oracle_index)
 
 
 def data_generator():

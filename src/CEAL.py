@@ -1,20 +1,20 @@
 from __future__ import print_function
 
 from keras.callbacks import ModelCheckpoint
-import cv2
 import numpy as np
 
 from data2 import load_data
 from utils import *
-from metrics import compute_metrics
+from metrics import validate
 
 create_paths()
 log_file = open(global_path + "logs/log_file.txt", 'a')
 
 # CEAL data definition
 X_train, y_train = load_data('train')
+n_samples = len(X_train)
 labeled_index = np.arange(0, nb_labeled)
-unlabeled_index = np.arange(nb_labeled, len(X_train))
+unlabeled_index = np.arange(nb_labeled, n_samples)
 
 X_val, y_val = load_data('val')
 
@@ -23,6 +23,7 @@ model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
 if initial_train:
+    print(f'Initial training with {nb_labeled} samples')
     model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
 
     if apply_augmentation:
@@ -41,6 +42,9 @@ if initial_train:
 else:
     model.load_weights(initial_weights_path)
 
+n_labeled_used = nb_labeled  # how many labeled samples have been used
+validate(model, X_val, y_val, 0, n_samples, n_labeled_used)
+
 # Active loop
 model_checkpoint = ModelCheckpoint(final_weights_path, monitor='loss', save_best_only=True)
 
@@ -55,7 +59,8 @@ for iteration in range(1, nb_iterations + 1):
     computed_sets = compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights, iteration)
     if computed_sets is None:
         break
-    X_labeled_train, y_labeled_train, labeled_index, unlabeled_index = computed_sets
+    X_labeled_train, y_labeled_train, labeled_index, unlabeled_index, oracle_size = computed_sets
+    n_labeled_used += oracle_size
 
     # (3) Training
     history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
@@ -64,25 +69,6 @@ for iteration in range(1, nb_iterations + 1):
     log(history, iteration, log_file)
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
 
-    # validate
-    predictions = model.predict(X_val)
-    # print(f'X_val: {X_val.shape}')  # (30, 6, 256, 256)
-    # print(f'y_val: {y_val.shape}')  # (30, 1, 256, 256)
-    # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
-    metrics = {}
-    for index in range(predictions.shape[0]):
-        sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
-        # print(sample_prediction.shape)  # (1, 256, 256)
-        sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
-        sample_metrics = compute_metrics(sample_true, sample_prediction)
-        for k in sample_metrics:
-            if k not in metrics:
-                metrics[k] = []
-            metrics[k].append(sample_metrics[k])
-    print(metrics)
-    for k in metrics:
-        metrics[k] = np.asarray(metrics[k]).mean()
-    print(metrics)
-
+    validate(model, X_val, y_val, iteration, n_samples, n_labeled_used)
 
 log_file.close()
