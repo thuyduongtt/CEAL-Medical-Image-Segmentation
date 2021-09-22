@@ -12,28 +12,34 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     # print(f'y_val: {y_val.shape}')  # (30, 1, 256, 256)
     # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
     metrics = {}
-    for index in range(len(X_val)):
-        sample_pred = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1]
-        # print(sample_pred.shape)  # (1, 256, 256)
-        sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
-
-        save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
-        save_img(f'val_{iteration}_{index}_true.png', sample_true)
-
-        sample_pred_int = sample_pred.astype('uint8')
-        sample_true_int = sample_true.astype('uint8')
-
-        sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
-        for k in sample_metrics:
-            if k not in metrics:
-                metrics[k] = []
-            metrics[k].append(sample_metrics[k])
-    for k in metrics:
-        metrics[k] = np.asarray(metrics[k]).mean()
-
     with open(global_path + "results/metrics.txt", 'a') as f:
         print(f'========================= Active Iteration {iteration}', file=f)
         print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
+
+        for index in range(len(X_val)):
+            sample_pred = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1]
+            # print(sample_pred.shape)  # (1, 256, 256)
+            sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
+
+            save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
+            save_img(f'val_{iteration}_{index}_true.png', sample_true)
+
+            sample_pred_int = sample_pred.astype('uint8')
+            sample_true_int = sample_true.astype('uint8')
+
+            sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
+            print(f'===== Sample {index}', file=f)
+            print(sample_metrics, file=f)
+
+            for k in sample_metrics:
+                if k not in metrics:
+                    metrics[k] = []
+                metrics[k].append(sample_metrics[k])
+
+        for k in metrics:
+            metrics[k] = np.asarray(metrics[k]).mean()
+
+        print(f'===== AVERAGE of {len(X_val)} samples', file=f)
         print(metrics, file=f)
         print('\n\n', file=f)
 
