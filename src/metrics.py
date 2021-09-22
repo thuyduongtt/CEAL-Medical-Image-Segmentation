@@ -115,5 +115,5 @@ def save_img(name, im):
     c, h, w = im.shape
     img = im.reshape(h, w, c)
     img_normalized = np.zeros(img.shape)
-    cv2.normalize(img, img_normalized, 0, 255, cv2.NORM_MINMAX)
+    img_normalized = cv2.normalize(img, img_normalized, 0, 255, cv2.NORM_MINMAX)
     cv2.imwrite(global_path + 'results/' + name, img_normalized)
