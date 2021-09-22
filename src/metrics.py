@@ -13,14 +13,17 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
     metrics = {}
     for index in range(len(X_val)):
-        sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
-        # print(sample_prediction.shape)  # (1, 256, 256)
-        sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        sample_pred = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1]
+        # print(sample_pred.shape)  # (1, 256, 256)
+        sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
 
-        save_img(f'val_{iteration}_{index}_pred.png', sample_prediction)
+        save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
         save_img(f'val_{iteration}_{index}_true.png', sample_true)
 
-        sample_metrics = compute_metrics(sample_true, sample_prediction)
+        sample_pred_int = sample_pred.astype('uint8')
+        sample_true_int = sample_true.astype('uint8')
+
+        sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
         for k in sample_metrics:
             if k not in metrics:
                 metrics[k] = []
@@ -32,7 +35,7 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
         print(f'========================= Active Iteration {iteration}', file=f)
         print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
         print(metrics, file=f)
-        print('\n\n')
+        print('\n\n', file=f)
 
 
 def test(model):
@@ -41,14 +44,17 @@ def test(model):
     predictions = model.predict(X_test)
     metrics = {}
     for index in range(len(X_test)):
-        sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
-        # print(sample_prediction.shape)  # (1, 256, 256)
-        sample_true = cv2.threshold(y_test[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
+        sample_pred = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1]
+        # print(sample_pred.shape)  # (1, 256, 256)
+        sample_true = cv2.threshold(y_test[index], 0.5, 1, cv2.THRESH_BINARY)[1]
 
-        save_img(f'test_{index}_pred.png', sample_prediction)
+        save_img(f'test_{index}_pred.png', sample_pred)
         save_img(f'test_{index}_true.png', sample_true)
 
-        sample_metrics = compute_metrics(sample_true, sample_prediction)
+        sample_pred_int = sample_pred.astype('uint8')
+        sample_true_int = sample_true.astype('uint8')
+
+        sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
         for k in sample_metrics:
             if k not in metrics:
                 metrics[k] = []
