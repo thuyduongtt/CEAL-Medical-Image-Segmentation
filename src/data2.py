@@ -99,6 +99,8 @@ def load_data(split='train'):
 
     y_train = y_train.astype('float32')
     y_train /= 255.  # scale masks to [0, 1]
+    y_train[y_train < 0.5] = 0.
+    y_train[y_train >= 0.5] = 1.
     return X_train, y_train
 
 
