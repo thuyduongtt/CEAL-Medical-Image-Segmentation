@@ -21,13 +21,23 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
             # print(sample_pred.shape)  # (1, 256, 256)
             sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
 
+            print(f'==================== {index}')
+            debug(predictions[index], 'predictions[index]')
+            debug(y_val[index], 'y_val[index]')
+            debug(sample_pred, 'sample_pred')
+            debug(sample_true, 'sample_true')
+
             save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
             save_img(f'val_{iteration}_{index}_true.png', sample_true)
 
             sample_pred_int = sample_pred.astype('uint8')
             sample_true_int = sample_true.astype('uint8')
 
+            debug(sample_pred_int, 'sample_pred_int')
+            debug(sample_true_int, 'sample_true_int')
+
             sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
+            print(sample_metrics)
             print(f'===== Sample {index}', file=f)
             print(sample_metrics, file=f)
 
@@ -119,7 +129,16 @@ def check_nan(t):
 
 def save_img(name, im):
     c, h, w = im.shape
-    img = im.reshape(h, w, c)
-    img_normalized = np.zeros(img.shape)
-    img_normalized = cv2.normalize(img, img_normalized, 0, 255, cv2.NORM_MINMAX)
-    cv2.imwrite(global_path + 'results/' + name, img_normalized)
+    img = im.reshape(h, w, c) * 255.
+    cv2.imwrite(global_path + 'results/' + name, img)
+
+
+def debug(arr, name):
+    mn = arr.min()
+    mx = arr.max()
+    unique, counts = np.unique(arr, return_counts=True)
+    n_unique = len(unique)
+    if n_unique == 2:
+        print(f'{name}: {mn} ({counts[0]}), {mx} ({counts[1]}), {n_unique}')
+    else:
+        print(f'{name}: {mn}, {mx}, {n_unique}')
