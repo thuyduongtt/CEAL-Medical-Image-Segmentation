@@ -4,7 +4,7 @@ import cv2
 from data2 import load_data
 
 from constants import img_rows, img_cols, global_path
-from src.visualization import print_log
+from visualization import print_log
 
 
 def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
@@ -13,7 +13,7 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     # print(f'y_val: {y_val.shape}')  # (30, 1, 256, 256)
     # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
     metrics = {}
-    with open(global_path + "results/metrics.txt", 'a') as f:
+    with open(global_path + f"results/metrics_{iteration}.txt", 'a') as f:
         print_log(f'========================= Active Iteration {iteration}', file=f)
         print_log(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
 

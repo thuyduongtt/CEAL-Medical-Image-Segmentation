@@ -78,10 +78,10 @@ def plot_multi(list_of_values, title, labels, output_dir, output_name,
     plt.savefig(f'{output_dir}/{output_name}.png')
     plt.close('all')
 
-    save_obj = {}
-    for i in range(len(list_of_values)):
-        save_obj[labels[i]] = list_of_values[i]
-    np.save(f'{output_dir}/{output_name}.npy', save_obj)
+    # save_obj = {}
+    # for i in range(len(list_of_values)):
+    #     save_obj[labels[i]] = list_of_values[i]
+    # np.save(f'{output_dir}/{output_name}.npy', save_obj)
 
 
 def export_label(label, path):

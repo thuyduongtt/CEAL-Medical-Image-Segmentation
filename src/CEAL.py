@@ -6,11 +6,13 @@ from data2 import load_data
 from metrics import validate, test
 import time
 from utils import *
-from visualization import print_log, sec_to_time
+from visualization import *
 
 create_paths()
-log_file = open(global_path + "logs/log_file.txt", 'w')
+log_file_path = global_path + "logs/log_file.txt"
+log_file = open(log_file_path, 'w')
 print_log(f'====== START TRAINING ({time.strftime("%d/%m/%Y %H:%M:%S")}) ======', file=log_file)
+log_file.close()
 start_time = time.time()
 
 # CEAL data definition
@@ -26,7 +28,7 @@ model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
 if initial_train:
-    print_log(f'Initial training with {nb_labeled} samples', file=log_file)
+    print_log(f'Initial training with {nb_labeled} samples', file_path=log_file_path)
     model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
 
     if apply_augmentation:
@@ -36,12 +38,20 @@ if initial_train:
                 steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[model_checkpoint])
 
             model.save(initial_weights_path)
-            log(history, initial_epoch, log_file)
+            # log(history, initial_epoch, log_file)
+
+            # history.history includes: 'loss' and 'dice_coef'
+            # history.history['loss'] and history.history['dice_coef'] are list with 'num_of_epoch' elements
+            plot_multi([history.history['loss'], history.history['dice_coef']], title='Loss and Dice during initial training', labels=['loss', 'dice_coef'],
+                       output_dir=f'{global_path}plots', output_name=f'init_train_{initial_epoch}')
+
     else:
         history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=32, epochs=nb_initial_epochs,
                             verbose=1, shuffle=True, callbacks=[model_checkpoint])
 
-        log(history, 0, log_file)
+        # log(history, 0, log_file)
+        plot_multi([history.history['loss'], history.history['dice_coef']], title='Loss and Dice during initial training', labels=['loss', 'dice_coef'],
+                   output_dir=f'{global_path}plots', output_name='init_train')
 else:
     model.load_weights(initial_weights_path)
 
@@ -52,6 +62,8 @@ validate(model, X_val, y_val, 0, n_samples, n_labeled_used)
 model_checkpoint = ModelCheckpoint(final_weights_path, monitor='loss', save_best_only=True)
 
 for iteration in range(1, nb_iterations + 1):
+    iter_start_time = time.time()
+
     if iteration == 1:
         weights = initial_weights_path
 
@@ -69,15 +81,22 @@ for iteration in range(1, nb_iterations + 1):
     history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
                         shuffle=True, callbacks=[model_checkpoint])
 
-    log(history, iteration, log_file)
+    # log(history, iteration, log_file)
+    plot_multi([history.history['loss'], history.history['dice_coef']], title=f'Loss and Dice during iteration {iteration}', labels=['loss', 'dice_coef'],
+               output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
+
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
 
     validate(model, X_val, y_val, iteration, n_samples, n_labeled_used)
 
+    iter_end_time = time.time()
+    per_iter_ptime = iter_end_time - iter_start_time
+    print_log(f'Iteration Time: {per_iter_ptime:.0f}s - {sec_to_time(per_iter_ptime)}', file_path=log_file_path)
+
 end_time = time.time()
 total_time = end_time - start_time
 print_log('============================\n', file=log_file)
-print_log(f'====== END TRAINING ({time.strftime("%d/%m/%Y %H:%M:%S")}) - {sec_to_time(total_time)} ======\n', file=log_file)
+print_log(f'====== END TRAINING ({time.strftime("%d/%m/%Y %H:%M:%S")}) - {sec_to_time(total_time)} ======\n', file_path=log_file_path)
 log_file.close()
 
 test(model)
