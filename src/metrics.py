@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, jaccard_score
 import cv2
 from data2 import load_data
 
@@ -90,36 +90,40 @@ def compute_metrics(y_true, y_pred):
     # print(np.unique(y_true_f))
     # print(np.unique(y_pred_f))
 
-    tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
+    # tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
+    #
+    # acc = (tn + tp) / (tn + tp + fp + fn)  # Accuracy (all correct / all)
+    # precision = tp / (tp + fp)  # Precision (true positives / predicted positives)
+    # sensitivity = tp / (tp + fn)  # Sensitivity aka Recall (true positives / all actual positives)
+    # fpr = fp / (fp + tn)  # False Positive Rate (Type I error)
+    # specificity = tn / (tn + fp)  # Specificity (true negatives / all actual negatives)
+    # error = (fn + fp) / (tn + tp + fp + fn)  # Misclassification (all incorrect / all)
+    # f1 = (2 * precision * sensitivity) / (precision + sensitivity)
+    #
+    # acc = check_nan(acc)
+    # precision = check_nan(precision)
+    # sensitivity = check_nan(sensitivity)
+    # fpr = check_nan(fpr)
+    # specificity = check_nan(specificity)
+    # error = check_nan(error)
+    # f1 = check_nan(f1)
 
-    acc = (tn + tp) / (tn + tp + fp + fn)  # Accuracy (all correct / all)
-    precision = tp / (tp + fp)  # Precision (true positives / predicted positives)
-    sensitivity = tp / (tp + fn)  # Sensitivity aka Recall (true positives / all actual positives)
-    fpr = fp / (fp + tn)  # False Positive Rate (Type I error)
-    specificity = tn / (tn + fp)  # Specificity (true negatives / all actual negatives)
-    error = (fn + fp) / (tn + tp + fp + fn)  # Misclassification (all incorrect / all)
-    f1 = (2 * precision * sensitivity) / (precision + sensitivity)
-
-    acc = check_nan(acc)
-    precision = check_nan(precision)
-    sensitivity = check_nan(sensitivity)
-    fpr = check_nan(fpr)
-    specificity = check_nan(specificity)
-    error = check_nan(error)
-    f1 = check_nan(f1)
+    f1 = f1_score(y_true_f[0], y_pred_f[0])
+    accuracy = accuracy_score(y_true_f[0], y_pred_f[0])
+    precision = precision_score(y_true_f[0], y_pred_f[0])
+    recall = recall_score(y_true_f[0], y_pred_f[0])
+    jaccard = jaccard_score(y_true_f[0], y_pred_f[0])
 
     intersection = np.sum(y_true_f * y_pred_f)
     dice = (2. * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
 
     return {
         'dice': dice,
-        'acc': acc,
+        'f1': f1,
+        'accuracy': accuracy,
         'precision': precision,
-        'sensitivity': sensitivity,
-        'fpr': fpr,
-        'specificity': specificity,
-        'error': error,
-        'f1': f1
+        'recall': recall,
+        'jaccard': jaccard
     }
 
 
