@@ -4,6 +4,7 @@ import cv2
 from data2 import load_data
 
 from constants import img_rows, img_cols, global_path
+from src.visualization import print_log
 
 
 def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
@@ -13,15 +14,15 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
     metrics = {}
     with open(global_path + "results/metrics.txt", 'a') as f:
-        print(f'========================= Active Iteration {iteration}', file=f)
-        print(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
+        print_log(f'========================= Active Iteration {iteration}', file=f)
+        print_log(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
 
         for index in range(len(X_val)):
             sample_pred = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1]
             # print(sample_pred.shape)  # (1, 256, 256)
             sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
 
-            print(f'==================== {index}')
+            print(f'==================== {index}', file=f)
             debug(predictions[index], 'predictions[index]')
             debug(y_val[index], 'y_val[index]')
             debug(sample_pred, 'sample_pred')
@@ -37,9 +38,9 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
             debug(sample_true_int, 'sample_true_int')
 
             sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
-            print(sample_metrics)
-            print(f'===== Sample {index}', file=f)
-            print(sample_metrics, file=f)
+            print_log(sample_metrics)
+            print_log(f'===== Sample {index}', file=f)
+            print_log(sample_metrics, file=f)
 
             for k in sample_metrics:
                 if k not in metrics:
@@ -49,9 +50,9 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
         for k in metrics:
             metrics[k] = np.asarray(metrics[k]).mean()
 
-        print(f'===== AVERAGE of {len(X_val)} samples', file=f)
-        print(metrics, file=f)
-        print('\n\n', file=f)
+        print_log(f'===== AVERAGE of {len(X_val)} samples', file=f)
+        print_log(metrics, file=f)
+        print_log('\n\n', file=f)
 
 
 def test(model):

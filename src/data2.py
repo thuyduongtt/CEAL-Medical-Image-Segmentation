@@ -49,7 +49,7 @@ def create_train_data(split='train'):
         images.append(img)
 
         mask = cv2.imread(str(Path(root, label_dir, path)), cv2.IMREAD_GRAYSCALE)
-        mask = mask.reshape(1, image_rows, image_cols)
+        mask = 255 - mask.reshape(1, image_rows, image_cols)
         masks.append(mask)
 
     def open_set(set_name):
