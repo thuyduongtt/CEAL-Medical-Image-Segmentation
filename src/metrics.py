@@ -23,10 +23,10 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
             sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
 
             print(f'==================== {index}', file=f)
-            debug(predictions[index], 'predictions[index]')
-            debug(y_val[index], 'y_val[index]')
-            debug(sample_pred, 'sample_pred')
-            debug(sample_true, 'sample_true')
+            # debug(predictions[index], 'predictions[index]')
+            # debug(y_val[index], 'y_val[index]')
+            # debug(sample_pred, 'sample_pred')
+            # debug(sample_true, 'sample_true')
 
             save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
             save_img(f'val_{iteration}_{index}_true.png', sample_true)
@@ -34,8 +34,8 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
             sample_pred_int = sample_pred.astype('uint8')
             sample_true_int = sample_true.astype('uint8')
 
-            debug(sample_pred_int, 'sample_pred_int')
-            debug(sample_true_int, 'sample_true_int')
+            # debug(sample_pred_int, 'sample_pred_int')
+            # debug(sample_true_int, 'sample_true_int')
 
             sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
             print_log(sample_metrics)
@@ -87,27 +87,6 @@ def compute_metrics(y_true, y_pred):
     smooth = 1.  # smoothing value to deal zero denominators.
     y_true_f = y_true.reshape([1, img_rows * img_cols])
     y_pred_f = y_pred.reshape([1, img_rows * img_cols])
-
-    # print(np.unique(y_true_f))
-    # print(np.unique(y_pred_f))
-
-    # tn, fp, fn, tp = confusion_matrix(y_true_f[0], y_pred_f[0]).ravel()
-    #
-    # acc = (tn + tp) / (tn + tp + fp + fn)  # Accuracy (all correct / all)
-    # precision = tp / (tp + fp)  # Precision (true positives / predicted positives)
-    # sensitivity = tp / (tp + fn)  # Sensitivity aka Recall (true positives / all actual positives)
-    # fpr = fp / (fp + tn)  # False Positive Rate (Type I error)
-    # specificity = tn / (tn + fp)  # Specificity (true negatives / all actual negatives)
-    # error = (fn + fp) / (tn + tp + fp + fn)  # Misclassification (all incorrect / all)
-    # f1 = (2 * precision * sensitivity) / (precision + sensitivity)
-    #
-    # acc = check_nan(acc)
-    # precision = check_nan(precision)
-    # sensitivity = check_nan(sensitivity)
-    # fpr = check_nan(fpr)
-    # specificity = check_nan(specificity)
-    # error = check_nan(error)
-    # f1 = check_nan(f1)
 
     f1 = f1_score(y_true_f[0], y_pred_f[0])
     accuracy = accuracy_score(y_true_f[0], y_pred_f[0])
