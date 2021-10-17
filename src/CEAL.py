@@ -27,6 +27,9 @@ X_val, y_val = load_data('val')
 model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
+all_loss = []
+all_dice = []
+
 if initial_train:
     print_log(f'Initial training with {nb_labeled} samples', file_path=log_file_path)
     model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
@@ -49,8 +52,11 @@ if initial_train:
         history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=32, epochs=nb_initial_epochs,
                             verbose=1, shuffle=True, callbacks=[model_checkpoint])
 
+        all_loss.extend(history.history['loss'])
+        all_dice.extend(history.history['dice_coef'])
+
         # log(history, 0, log_file)
-        plot_multi([history.history['loss'], history.history['dice_coef']], title='Loss and Dice during initial training', labels=['loss', 'dice_coef'],
+        plot_multi([all_loss, all_dice], title='Loss and Dice after initial training', labels=['loss', 'dice_coef'],
                    output_dir=f'{global_path}plots', output_name='init_train')
 else:
     model.load_weights(initial_weights_path)
@@ -81,8 +87,11 @@ for iteration in range(1, nb_iterations + 1):
     history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
                         shuffle=True, callbacks=[model_checkpoint])
 
+    all_loss.extend(history.history['loss'])
+    all_dice.extend(history.history['dice_coef'])
+
     # log(history, iteration, log_file)
-    plot_multi([history.history['loss'], history.history['dice_coef']], title=f'Loss and Dice during iteration {iteration}', labels=['loss', 'dice_coef'],
+    plot_multi([all_loss, all_dice], title=f'Loss and Dice after iteration {iteration}', labels=['loss', 'dice_coef'],
                output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
 
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
