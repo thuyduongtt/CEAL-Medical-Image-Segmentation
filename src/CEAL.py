@@ -28,7 +28,6 @@ model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
 all_loss = []
-all_dice = []
 
 if initial_train:
     print_log(f'Initial training with {nb_labeled} samples', file_path=log_file_path)
@@ -37,27 +36,27 @@ if initial_train:
     if apply_augmentation:
         for initial_epoch in range(0, nb_initial_epochs):
             history = model.fit_generator(
-                data_generator().flow(X_train[labeled_index], y_train[labeled_index], batch_size=32, shuffle=True),
+                data_generator().flow(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, shuffle=True),
                 steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[model_checkpoint])
 
             model.save(initial_weights_path)
             # log(history, initial_epoch, log_file)
+            all_loss.extend(history.history['loss'])
 
             # history.history includes: 'loss' and 'dice_coef'
             # history.history['loss'] and history.history['dice_coef'] are list with 'num_of_epoch' elements
-            plot_multi([history.history['loss'], history.history['dice_coef']], title='Loss and Dice during initial training', labels=['loss', 'dice_coef'],
-                       output_dir=f'{global_path}plots', output_name=f'init_train_{initial_epoch}')
+            plot([all_loss], title='Losses after initial training', labels=['loss'],
+                 output_dir=f'{global_path}plots', output_name=f'init_train_{initial_epoch}')
 
     else:
-        history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=32, epochs=nb_initial_epochs,
+        history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, epochs=nb_initial_epochs,
                             verbose=1, shuffle=True, callbacks=[model_checkpoint])
 
         all_loss.extend(history.history['loss'])
-        all_dice.extend(history.history['dice_coef'])
 
         # log(history, 0, log_file)
-        plot_multi([all_loss, all_dice], title='Loss and Dice after initial training', labels=['loss', 'dice_coef'],
-                   output_dir=f'{global_path}plots', output_name='init_train')
+        plot([all_loss], title='Losses after initial training', labels=['loss'],
+             output_dir=f'{global_path}plots', output_name='init_train')
 else:
     model.load_weights(initial_weights_path)
 
@@ -84,15 +83,14 @@ for iteration in range(1, nb_iterations + 1):
     n_labeled_used += oracle_size
 
     # (3) Training
-    history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1,
+    history = model.fit(X_labeled_train, y_labeled_train, batch_size=batch_size, epochs=nb_active_epochs, verbose=1,
                         shuffle=True, callbacks=[model_checkpoint])
 
     all_loss.extend(history.history['loss'])
-    all_dice.extend(history.history['dice_coef'])
 
     # log(history, iteration, log_file)
-    plot_multi([all_loss, all_dice], title=f'Loss and Dice after iteration {iteration}', labels=['loss', 'dice_coef'],
-               output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
+    plot([all_loss], title=f'Losses after iteration {iteration}', labels=['loss'],
+         output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
 
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
 

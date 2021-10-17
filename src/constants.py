@@ -36,4 +36,4 @@ initial_train = True
 apply_augmentation = False
 nb_initial_epochs = 10
 nb_active_epochs = 2
-batch_size = 128
+batch_size = 32
