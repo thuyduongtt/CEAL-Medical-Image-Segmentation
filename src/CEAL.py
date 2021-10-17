@@ -31,6 +31,7 @@ all_loss = []
 
 if initial_train:
     print_log(f'Initial training with {nb_labeled} samples', file_path=log_file_path)
+    iter_start_time = time.time()
     model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
 
     if apply_augmentation:
@@ -57,6 +58,11 @@ if initial_train:
         # log(history, 0, log_file)
         plot([all_loss], title='Losses after initial training', labels=['loss'],
              output_dir=f'{global_path}plots', output_name='init_train')
+
+    iter_end_time = time.time()
+    iter_time = iter_end_time - iter_start_time
+    print_log(f'Iteration Time: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
+    
 else:
     model.load_weights(initial_weights_path)
 
@@ -97,8 +103,8 @@ for iteration in range(1, nb_iterations + 1):
     validate(model, X_val, y_val, iteration, n_samples, n_labeled_used)
 
     iter_end_time = time.time()
-    per_iter_ptime = iter_end_time - iter_start_time
-    print_log(f'Iteration Time: {per_iter_ptime:.0f}s - {sec_to_time(per_iter_ptime)}', file_path=log_file_path)
+    iter_time = iter_end_time - iter_start_time
+    print_log(f'Iteration Time: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
 
 end_time = time.time()
 total_time = end_time - start_time

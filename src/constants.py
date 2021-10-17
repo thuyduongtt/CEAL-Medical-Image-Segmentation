@@ -34,6 +34,6 @@ pseudo_rate = 20
 
 initial_train = True
 apply_augmentation = False
-nb_initial_epochs = 10
-nb_active_epochs = 2
+nb_initial_epochs = 100
+nb_active_epochs = 20
 batch_size = 32
