@@ -92,7 +92,7 @@ def get_unet(dropout):
 
     model = Model(inputs, conv10)
 
-    model.compile(optimizer=Adam(learning_rate=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
+    model.compile(optimizer=Adam(learning_rate=1e-4), loss=dice_coef_loss, metrics=[dice_coef])
 
     # model.summary()
 

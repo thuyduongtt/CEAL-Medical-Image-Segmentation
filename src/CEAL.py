@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 
 from data2 import load_data
 from metrics import validate, test
@@ -27,6 +27,8 @@ X_val, y_val = load_data('val')
 model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
+early_stopper = EarlyStopping(monitor='loss')
+
 all_loss = []
 
 if initial_train:
@@ -38,7 +40,7 @@ if initial_train:
         for initial_epoch in range(0, nb_initial_epochs):
             history = model.fit_generator(
                 data_generator().flow(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, shuffle=True),
-                steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[model_checkpoint])
+                steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[early_stopper, model_checkpoint])
 
             model.save(initial_weights_path)
             # log(history, initial_epoch, log_file)
@@ -51,18 +53,17 @@ if initial_train:
 
     else:
         history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, epochs=nb_initial_epochs,
-                            verbose=1, shuffle=True, callbacks=[model_checkpoint])
+                            verbose=1, shuffle=True, callbacks=[early_stopper, model_checkpoint])
 
         all_loss.extend(history.history['loss'])
 
         # log(history, 0, log_file)
-        plot([all_loss], title='Losses after initial training', labels=['loss'],
-             output_dir=f'{global_path}plots', output_name='init_train')
+        plot([all_loss], title='Losses after initial training', labels=['loss'], output_dir=f'{global_path}plots', output_name='init_train')
 
     iter_end_time = time.time()
     iter_time = iter_end_time - iter_start_time
     print_log(f'Iteration Time: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
-    
+
 else:
     model.load_weights(initial_weights_path)
 
@@ -90,13 +91,12 @@ for iteration in range(1, nb_iterations + 1):
 
     # (3) Training
     history = model.fit(X_labeled_train, y_labeled_train, batch_size=batch_size, epochs=nb_active_epochs, verbose=1,
-                        shuffle=True, callbacks=[model_checkpoint])
+                        shuffle=True, callbacks=[early_stopper, model_checkpoint])
 
     all_loss.extend(history.history['loss'])
 
     # log(history, iteration, log_file)
-    plot([all_loss], title=f'Losses after iteration {iteration}', labels=['loss'],
-         output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
+    plot([all_loss], title=f'Losses after iteration {iteration}', labels=['loss'], output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
 
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
 
