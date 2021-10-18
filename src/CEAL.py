@@ -62,7 +62,7 @@ if initial_train:
 
     iter_end_time = time.time()
     iter_time = iter_end_time - iter_start_time
-    print_log(f'Iteration Time: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
+    print_log(f'Initial iteration: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
 
 else:
     model.load_weights(initial_weights_path)
@@ -104,7 +104,7 @@ for iteration in range(1, nb_iterations + 1):
 
     iter_end_time = time.time()
     iter_time = iter_end_time - iter_start_time
-    print_log(f'Iteration Time: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
+    print_log(f'Iteration {iteration}: {iter_time:.0f}s - {sec_to_time(iter_time)}', file_path=log_file_path)
 
 end_time = time.time()
 total_time = end_time - start_time
