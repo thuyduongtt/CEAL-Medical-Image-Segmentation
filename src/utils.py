@@ -7,9 +7,11 @@ import cv2
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 from scipy.ndimage.morphology import distance_transform_edt as edt
+import time
 
 from constants import *
 from unet import get_unet
+from visualization import print_log, sec_to_time
 
 
 def range_transform(sample):
@@ -190,44 +192,51 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
     :return: unlabeled_index: Update of labeled index, removing the manual annotations.
 
     """
-    print("\nActive iteration " + str(iteration))
-    print("-" * 50 + "\n")
+
+    log_file = open(global_path + "logs/log_file.txt", 'w')
+
+    print_log("\nActive iteration " + str(iteration), file=log_file)
+    print_log("-" * 50 + "\n", file=log_file)
 
     if len(unlabeled_index) == 0:
         print('No unlabeled sample left. Finishing...')
         return None
 
     # load models
-    modelUncertain = get_unet(dropout=True)
-    modelUncertain.load_weights(weights)
-    modelPredictions = get_unet(dropout=False)
-    modelPredictions.load_weights(weights)
+    model_uncertain = get_unet(dropout=True)
+    model_uncertain.load_weights(weights)
+    model_predictions = get_unet(dropout=False)
+    model_predictions.load_weights(weights)
 
     # predictions
-    print("Computing log predictions ...\n")
-    predictions = predict(X_train[unlabeled_index], modelPredictions)
+    print_log("Computing log predictions ...\n", file=log_file)
+    predictions = predict(X_train[unlabeled_index], model_predictions)
 
     uncertain = np.zeros(len(unlabeled_index))
     accuracy = np.zeros(len(unlabeled_index))
 
-    print("Computing train sets ...")
+    print_log("Computing train sets ...", file=log_file)
+    start_time = time.time()
     for index in range(0, len(unlabeled_index)):
 
         if index % 100 == 0:
-            print("completed: " + str(index) + "/" + str(len(unlabeled_index)))
+            print_log("completed: " + str(index) + "/" + str(len(unlabeled_index)), file=log_file)
 
         sample = X_train[unlabeled_index[index]].reshape([1, n_channel, img_rows, img_cols])
 
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
 
         accuracy[index] = compute_dice_coef(y_train[unlabeled_index[index]][0], sample_prediction)
-        uncertain[index] = compute_uncertain(sample, sample_prediction, modelUncertain)
+        uncertain[index] = compute_uncertain(sample, sample_prediction, model_uncertain)
+
+    end_time = time.time()
+    duration = end_time - start_time
+    print_log(f'Time: {duration:.0f}s - {sec_to_time(duration)}', file=log_file)
 
     np.save(global_path + "logs/uncertain" + str(iteration), uncertain)
     np.save(global_path + "logs/accuracy" + str(iteration), accuracy)
 
-    oracle_index = get_oracle_index(uncertain, nb_no_detections, nb_random, nb_most_uncertain,
-                                    most_uncertain_rate)
+    oracle_index = get_oracle_index(uncertain, nb_no_detections, nb_random, nb_most_uncertain, most_uncertain_rate)
 
     oracle_rank = unlabeled_index[oracle_index]
 
@@ -236,7 +245,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
 
     labeled_index = np.concatenate((labeled_index, oracle_rank))
 
-    print(f'Oracle size: {len(oracle_index)}')
+    print_log(f'Oracle size: {len(oracle_index)}', file=log_file)
 
     if iteration >= pseudo_epoch:
 
@@ -249,7 +258,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         X_labeled_train = np.concatenate((X_train[labeled_index], X_train[pseudo_index]))
         y_labeled_train = np.concatenate((y_train[labeled_index], predictions[pseudo_index]))
 
-        print(f'Pseudo size: {len(pseudo_index)}')
+        print_log(f'Pseudo size: {len(pseudo_index)}', file=log_file)
 
     else:
         X_labeled_train = np.concatenate((X_train[labeled_index])).reshape(

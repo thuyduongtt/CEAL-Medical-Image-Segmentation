@@ -4,7 +4,6 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
 
 from data2 import load_data
 from metrics import validate, test
-import time
 from utils import *
 from visualization import *
 
