@@ -193,7 +193,7 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
 
     """
 
-    log_file = open(global_path + "logs/log_file.txt", 'w')
+    log_file = open(global_path + "logs/log_file.txt", 'a')
 
     print_log("\nActive iteration " + str(iteration), file=log_file)
     print_log("-" * 50 + "\n", file=log_file)
@@ -266,6 +266,8 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
+
+    log_file.close()
 
     return X_labeled_train, y_labeled_train, labeled_index, unlabeled_index, len(oracle_index)
 

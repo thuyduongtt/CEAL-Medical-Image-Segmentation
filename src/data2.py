@@ -1,14 +1,13 @@
 from __future__ import print_function
 
-import os
+from pathlib import Path
 
 import cv2
 import numpy as np
-from pathlib import Path
 
 from constants import *
 
-DATA_PATH = '../../data/QB/'
+DATA_PATH = '../../data/QB/regions/'
 
 
 def preprocessor(input_img):
@@ -45,7 +44,7 @@ def create_train_data(split='train'):
         img1 = cv2.imread(str(patch))
         img2 = cv2.imread(str(Path(root, input_dir_2, path)))
         img = np.concatenate((img1, img2), axis=-1)
-        img = img.reshape(n_channel, image_rows, image_cols)
+        img = img.reshape((n_channel, image_rows, image_cols))
         images.append(img)
 
         mask = cv2.imread(str(Path(root, label_dir, path)), cv2.IMREAD_GRAYSCALE)

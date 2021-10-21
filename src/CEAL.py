@@ -26,7 +26,7 @@ X_val, y_val = load_data('val')
 model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
-early_stopper = EarlyStopping(monitor='loss', mode='min', patience=30)
+# early_stopper = EarlyStopping(monitor='loss', mode='min', patience=30)
 tensorboard = TensorBoard(log_dir=f'{global_path}logs')
 
 all_loss = []
@@ -40,7 +40,7 @@ if initial_train:
         for initial_epoch in range(0, nb_initial_epochs):
             history = model.fit_generator(
                 data_generator().flow(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, shuffle=True),
-                steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[early_stopper, model_checkpoint, tensorboard])
+                steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[model_checkpoint, tensorboard])
 
             model.save(initial_weights_path)
             # log(history, initial_epoch, log_file)
@@ -53,7 +53,7 @@ if initial_train:
 
     else:
         history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, epochs=nb_initial_epochs,
-                            verbose=1, shuffle=True, callbacks=[early_stopper, model_checkpoint, tensorboard])
+                            verbose=1, shuffle=True, callbacks=[model_checkpoint, tensorboard])
 
         all_loss.extend(history.history['loss'])
 
@@ -91,7 +91,7 @@ for iteration in range(1, nb_iterations + 1):
 
     # (3) Training
     history = model.fit(X_labeled_train, y_labeled_train, batch_size=batch_size, epochs=nb_active_epochs, verbose=1,
-                        shuffle=True, callbacks=[early_stopper, model_checkpoint, tensorboard])
+                        shuffle=True, callbacks=[model_checkpoint, tensorboard])
 
     all_loss.extend(history.history['loss'])
 

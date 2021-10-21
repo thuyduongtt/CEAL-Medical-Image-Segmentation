@@ -23,19 +23,12 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
             sample_true = cv2.threshold(y_val[index], 0.5, 1, cv2.THRESH_BINARY)[1]
 
             print(f'==================== {index}', file=f)
-            # debug(predictions[index], 'predictions[index]')
-            # debug(y_val[index], 'y_val[index]')
-            # debug(sample_pred, 'sample_pred')
-            # debug(sample_true, 'sample_true')
 
             save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
             save_img(f'val_{iteration}_{index}_true.png', sample_true)
 
             sample_pred_int = sample_pred.astype('uint8')
             sample_true_int = sample_true.astype('uint8')
-
-            # debug(sample_pred_int, 'sample_pred_int')
-            # debug(sample_true_int, 'sample_true_int')
 
             sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
             print_log(sample_metrics)
@@ -97,13 +90,18 @@ def compute_metrics(y_true, y_pred):
     intersection = np.sum(y_true_f * y_pred_f)
     dice = (2. * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
 
+    dice2 = 2 * jaccard / (1 + jaccard)
+
+    print(f'Their dice: {dice:.4f}')
+    print(f'My dice: {dice2:.4f}')
+
     return {
-        'dice': dice,
         'f1': f1,
         'accuracy': accuracy,
         'precision': precision,
         'recall': recall,
-        'jaccard': jaccard
+        'jaccard': jaccard,
+        'dice': dice2,
     }
 
 
