@@ -7,7 +7,7 @@ import numpy as np
 
 from constants import *
 
-DATA_PATH = '../../data/QB/regions/'
+DATA_PATH = '../../data/QB/'
 
 
 def preprocessor(input_img):
@@ -19,8 +19,8 @@ def preprocessor(input_img):
     output_img = np.ndarray((input_img.shape[0], input_img.shape[1], img_rows, img_cols), dtype=np.uint8)
     for i in range(input_img.shape[0]):
         # reshaped = input_img[i].reshape(input_img.shape[-1], input_img.shape[1], input_img.shape[2])
-        # processed = cv2.resize(reshaped[0], (img_cols, img_rows), interpolation=cv2.INTER_CUBIC)
-        # output_img[i] = np.array([processed]).reshape(img_rows, img_cols, input_img.shape[-1])
+        # processed = cv2.resize(reshaped[0], (ds_img_cols, ds_img_rows), interpolation=cv2.INTER_CUBIC)
+        # output_img[i] = np.array([processed]).reshape(ds_img_rows, ds_img_cols, input_img.shape[-1])
         output_img[i, 0] = cv2.resize(input_img[i, 0], (img_cols, img_rows), interpolation=cv2.INTER_CUBIC)
     return output_img
 
@@ -30,8 +30,8 @@ def create_train_data(split='train'):
     Generate training data numpy arrays and save them into the project path
     """
 
-    image_rows = 256
-    image_cols = 256
+    ds_img_rows = 246
+    ds_img_cols = 288
 
     input_dir_1 = 'input1'
     input_dir_2 = 'input2'
@@ -40,15 +40,33 @@ def create_train_data(split='train'):
     images = []
     masks = []
 
+    scale_ratio_r = 1
+    scale_ratio_c = 1
+    if ds_img_rows < 256:
+        scale_ratio_r = 256 / ds_img_rows
+    if ds_img_cols < 256:
+        scale_ratio_c = 256 / ds_img_cols
+    scale_ratio = max(scale_ratio_r, scale_ratio_c)
+    if scale_ratio > 1:
+        new_width = int(ds_img_cols * scale_ratio)
+        new_height = int(ds_img_rows * scale_ratio)
+
     def open_patch(root, patch, path):
         img1 = cv2.imread(str(patch))
         img2 = cv2.imread(str(Path(root, input_dir_2, path)))
+
+        if scale_ratio > 1:
+            img1 = cv2.resize(img1, (new_width, new_height))
+            img2 = cv2.resize(img2, (new_width, new_height))
+
         img = np.concatenate((img1, img2), axis=-1)
-        img = img.reshape((n_channel, image_rows, image_cols))
+        img = img.reshape((n_channel, new_height, new_width))
         images.append(img)
 
         mask = cv2.imread(str(Path(root, label_dir, path)), cv2.IMREAD_GRAYSCALE)
-        mask = 255 - mask.reshape(1, image_rows, image_cols)
+        if scale_ratio > 1:
+            mask = cv2.resize(mask, (new_width, new_height))
+        mask = 255 - mask.reshape(1, new_height, new_width)
         masks.append(mask)
 
     def open_set(set_name):

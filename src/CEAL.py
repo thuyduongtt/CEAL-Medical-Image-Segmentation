@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
+from keras.callbacks import ModelCheckpoint, TensorBoard
 
 from data2 import load_data
 from metrics import validate, test
