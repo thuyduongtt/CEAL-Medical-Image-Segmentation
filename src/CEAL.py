@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.callbacks import ModelCheckpoint
 
 from data2 import load_data
 from metrics import validate, test
@@ -27,9 +27,10 @@ model = get_unet(dropout=True)
 # model.load_weights(initial_weights_path)
 
 # early_stopper = EarlyStopping(monitor='loss', mode='min', patience=30)
-tensorboard = TensorBoard(log_dir=f'{global_path}logs')
+# tensorboard = TensorBoard(log_dir=f'{global_path}logs')
 
 all_loss = []
+all_metrics = {}
 
 if initial_train:
     print_log(f'Initial training with {nb_labeled} samples', file_path=log_file_path)
@@ -40,7 +41,7 @@ if initial_train:
         for initial_epoch in range(0, nb_initial_epochs):
             history = model.fit_generator(
                 data_generator().flow(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, shuffle=True),
-                steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[model_checkpoint, tensorboard])
+                steps_per_epoch=len(labeled_index), nb_epoch=1, verbose=1, callbacks=[model_checkpoint])
 
             model.save(initial_weights_path)
             # log(history, initial_epoch, log_file)
@@ -53,7 +54,7 @@ if initial_train:
 
     else:
         history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=batch_size, epochs=nb_initial_epochs,
-                            verbose=1, shuffle=True, callbacks=[model_checkpoint, tensorboard])
+                            verbose=1, shuffle=True, callbacks=[model_checkpoint])
 
         all_loss.extend(history.history['loss'])
 
@@ -91,16 +92,23 @@ for iteration in range(1, nb_iterations + 1):
 
     # (3) Training
     history = model.fit(X_labeled_train, y_labeled_train, batch_size=batch_size, epochs=nb_active_epochs, verbose=1,
-                        shuffle=True, callbacks=[model_checkpoint, tensorboard])
+                        shuffle=True, callbacks=[model_checkpoint])
 
     all_loss.extend(history.history['loss'])
 
     # log(history, iteration, log_file)
-    plot([all_loss], title=f'Losses after iteration {iteration}', labels=['loss'], output_dir=f'{global_path}plots', output_name=f'iter_{iteration}')
+    plot([all_loss], title=f'Losses after iteration {iteration}', labels=['loss'], output_dir=f'{global_path}plots', output_name=f'loss_{iteration}')
 
     model.save(global_path + "models/active_model" + str(iteration) + ".h5")
 
-    validate(model, X_val, y_val, iteration, n_samples, n_labeled_used)
+    metrics = validate(model, X_val, y_val, iteration, n_samples, n_labeled_used)
+    for k in metrics:
+        if k not in all_metrics:
+            all_metrics[k] = []
+        all_metrics[k].extend(metrics[k])
+    plot([all_metrics['f1'], all_metrics['accuracy'], all_metrics['precision'], all_metrics['recall'], all_metrics['dice'], all_metrics['jaccard']],
+         f'Validation Scores at Iteration {iteration}', labels=['F1', 'Accuracy', 'Precision', 'Recall', 'Dice', 'Jaccard'],
+         output_dir=f'{global_path}plots', output_name=f'val_{iteration}', ylabel='value')
 
     iter_end_time = time.time()
     iter_time = iter_end_time - iter_start_time

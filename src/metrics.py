@@ -13,6 +13,7 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
     # print(f'y_val: {y_val.shape}')  # (30, 1, 256, 256)
     # print(f'Predictions: {predictions.shape}')  # (30, 1, 256, 256)
     metrics = {}
+    avg_metrics = {}
     with open(global_path + f"results/metrics_{iteration}.txt", 'a') as f:
         print_log(f'========================= Active Iteration {iteration}', file=f)
         print_log(f'Num of samples: {n_labeled_used} / {n_samples} ==> {n_labeled_used / n_samples * 100:.0f}%', file=f)
@@ -24,8 +25,9 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
 
             print(f'==================== {index}', file=f)
 
-            save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
-            save_img(f'val_{iteration}_{index}_true.png', sample_true)
+            if iteration % 10 == 0:
+                save_img(f'val_{iteration}_{index}_pred.png', sample_pred)
+                save_img(f'val_{iteration}_{index}_true.png', sample_true)
 
             sample_pred_int = sample_pred.astype('uint8')
             sample_true_int = sample_true.astype('uint8')
@@ -41,11 +43,13 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
                 metrics[k].append(sample_metrics[k])
 
         for k in metrics:
-            metrics[k] = np.asarray(metrics[k]).mean()
+            avg_metrics[k] = np.asarray(metrics[k]).mean()
 
         print_log(f'===== AVERAGE of {len(X_val)} samples', file=f)
-        print_log(metrics, file=f)
+        print_log(avg_metrics, file=f)
         print_log('\n\n', file=f)
+
+    return metrics
 
 
 def test(model):
