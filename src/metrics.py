@@ -49,7 +49,7 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
         print_log(avg_metrics, file=f)
         print_log('\n\n', file=f)
 
-    return metrics
+    return avg_metrics
 
 
 def test(model):

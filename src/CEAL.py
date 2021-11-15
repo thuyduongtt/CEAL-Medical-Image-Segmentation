@@ -105,7 +105,7 @@ for iteration in range(1, nb_iterations + 1):
     for k in metrics:
         if k not in all_metrics:
             all_metrics[k] = []
-        all_metrics[k].extend(metrics[k])
+        all_metrics[k].append(metrics[k])
     plot([all_metrics['f1'], all_metrics['accuracy'], all_metrics['precision'], all_metrics['recall'], all_metrics['dice'], all_metrics['jaccard']],
          f'Validation Scores at Iteration {iteration}', labels=['F1', 'Accuracy', 'Precision', 'Recall', 'Dice', 'Jaccard'],
          output_dir=f'{global_path}plots', output_name=f'val_{iteration}', ylabel='value')
