@@ -40,33 +40,16 @@ def create_train_data(split='train'):
     images = []
     masks = []
 
-    scale_ratio_r = 1
-    scale_ratio_c = 1
-    if ds_img_rows < 256:
-        scale_ratio_r = 256 / ds_img_rows
-    if ds_img_cols < 256:
-        scale_ratio_c = 256 / ds_img_cols
-    scale_ratio = max(scale_ratio_r, scale_ratio_c)
-    if scale_ratio > 1:
-        new_width = int(ds_img_cols * scale_ratio)
-        new_height = int(ds_img_rows * scale_ratio)
-
     def open_patch(root, patch, path):
         img1 = cv2.imread(str(patch))
         img2 = cv2.imread(str(Path(root, input_dir_2, path)))
 
-        if scale_ratio > 1:
-            img1 = cv2.resize(img1, (new_width, new_height))
-            img2 = cv2.resize(img2, (new_width, new_height))
-
         img = np.concatenate((img1, img2), axis=-1)
-        img = img.reshape((n_channel, new_height, new_width))
+        img = img.reshape((n_channel, ds_img_rows, ds_img_cols))
         images.append(img)
 
         mask = cv2.imread(str(Path(root, label_dir, path)), cv2.IMREAD_GRAYSCALE)
-        if scale_ratio > 1:
-            mask = cv2.resize(mask, (new_width, new_height))
-        mask = 255 - mask.reshape(1, new_height, new_width)
+        mask = 255 - mask.reshape(1, ds_img_rows, ds_img_cols)
         masks.append(mask)
 
     def open_set(set_name):

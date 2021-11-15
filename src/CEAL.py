@@ -69,7 +69,14 @@ else:
     model.load_weights(initial_weights_path)
 
 n_labeled_used = nb_labeled  # how many labeled samples have been used
-validate(model, X_val, y_val, 0, n_samples, n_labeled_used)
+metrics = validate(model, X_val, y_val, 0, n_samples, n_labeled_used)
+for k in metrics:
+    if k not in all_metrics:
+        all_metrics[k] = []
+    all_metrics[k].append(metrics[k])
+plot([all_metrics['f1'], all_metrics['accuracy'], all_metrics['precision'], all_metrics['recall'], all_metrics['dice'], all_metrics['jaccard']],
+     f'Validation Scores at initial iteration', labels=['F1', 'Accuracy', 'Precision', 'Recall', 'Dice', 'Jaccard'],
+     output_dir=f'{global_path}plots', output_name=f'val_init', ylabel='value')
 
 # Active loop
 model_checkpoint = ModelCheckpoint(final_weights_path, monitor='loss', save_best_only=True)
