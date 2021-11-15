@@ -30,8 +30,8 @@ def create_train_data(split='train'):
     Generate training data numpy arrays and save them into the project path
     """
 
-    ds_img_rows = 246
-    ds_img_cols = 288
+    ds_img_rows = 256
+    ds_img_cols = 256
 
     input_dir_1 = 'input1'
     input_dir_2 = 'input2'
