@@ -74,9 +74,6 @@ for k in metrics:
     if k not in all_metrics:
         all_metrics[k] = []
     all_metrics[k].append(metrics[k])
-plot([all_metrics['f1'], all_metrics['accuracy'], all_metrics['precision'], all_metrics['recall'], all_metrics['dice'], all_metrics['jaccard']],
-     f'Validation Scores at initial iteration', labels=['F1', 'Accuracy', 'Precision', 'Recall', 'Dice', 'Jaccard'],
-     output_dir=f'{global_path}plots', output_name=f'val_init', ylabel='value')
 
 # Active loop
 model_checkpoint = ModelCheckpoint(final_weights_path, monitor='loss', save_best_only=True)
@@ -123,7 +120,7 @@ for iteration in range(1, nb_iterations + 1):
 
 end_time = time.time()
 total_time = end_time - start_time
-print_log('============================\n', file=log_file)
+print_log('============================\n', file_path=log_file_path)
 print_log(f'====== END TRAINING ({time.strftime("%d/%m/%Y %H:%M:%S")}) - {sec_to_time(total_time)} ======\n', file_path=log_file_path)
 log_file.close()
 

@@ -11,11 +11,12 @@ colors = [
     ['orange', 'lightskyblue', 'red', 'limegreen', 'darkviolet'],
     ['orange', 'lightskyblue', 'red', 'limegreen', 'darkviolet', 'deeppink'],
 ]
+MAX_N_COLORS = 6
 
 
 def plot(list_of_values, title, labels, output_dir, output_name,
-               xlabel='iterations', ylabel='loss', linewidth=1.5, markers=None, figsize=(10, 5), upperbound=0.0,
-               xticks=None, xticklabels=None, yticks=None, yticklabels=None, areas=None):
+         xlabel='iterations', ylabel='loss', linewidth=1.5, markers=None, figsize=(10, 5), upperbound=0.0,
+         xticks=None, xticklabels=None, yticks=None, yticklabels=None, areas=None):
     plt.figure(figsize=figsize)
     plt.title(title)
     n = len(list_of_values) - 1
@@ -24,7 +25,7 @@ def plot(list_of_values, title, labels, output_dir, output_name,
             m = None
         else:
             m = markers[i]
-        if n < 3:
+        if n < MAX_N_COLORS:
             plt.plot(list_of_values[i], label=labels[i], color=colors[n][i], linewidth=linewidth, marker=m)
         else:
             plt.plot(list_of_values[i], label=labels[i], linewidth=linewidth, marker=m)

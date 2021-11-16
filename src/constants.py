@@ -17,7 +17,7 @@ nb_labeled = 270
 
 # CEAL parameters
 apply_edt = True
-nb_iterations = 40
+nb_iterations = 100
 # each iteration num of unlabeled samples is reduced by 31
 # just set to a big number, program will stop when there's no unlabeled samples left
 

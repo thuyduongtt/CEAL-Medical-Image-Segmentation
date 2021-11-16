@@ -96,8 +96,8 @@ def compute_metrics(y_true, y_pred):
 
     dice2 = 2 * jaccard / (1 + jaccard)
 
-    print(f'Their dice: {dice:.4f}')
-    print(f'My dice: {dice2:.4f}')
+    # print(f'Their dice: {dice:.4f}')
+    # print(f'My dice: {dice2:.4f}')
 
     return {
         'f1': f1,
