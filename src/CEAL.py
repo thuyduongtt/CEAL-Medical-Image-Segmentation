@@ -124,4 +124,4 @@ print_log('============================\n', file_path=log_file_path)
 print_log(f'====== END TRAINING ({time.strftime("%d/%m/%Y %H:%M:%S")}) - {sec_to_time(total_time)} ======\n', file_path=log_file_path)
 log_file.close()
 
-test(model)
+# test(model)

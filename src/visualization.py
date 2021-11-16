@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-# https://matplotlib.org/3.1.0/gallery/color/named_colors.html
+# https://matplotlib.org/stable/gallery/color/named_colors.html
 colors = [
     ['steelblue'],
     ['steelblue', 'red'],
-    ['orange', 'lightskyblue', 'red'],
-    ['orange', 'lightskyblue', 'red', 'limegreen'],
-    ['orange', 'lightskyblue', 'red', 'limegreen', 'darkviolet'],
-    ['orange', 'lightskyblue', 'red', 'limegreen', 'darkviolet', 'deeppink'],
+    ['darkorange', 'deepskyblue', 'red'],
+    ['darkorange', 'deepskyblue', 'red', 'limegreen'],
+    ['darkorange', 'deepskyblue', 'red', 'limegreen', 'darkviolet'],
+    ['darkorange', 'deepskyblue', 'red', 'limegreen', 'darkviolet', 'cyan']
 ]
 MAX_N_COLORS = 6
 
