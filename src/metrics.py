@@ -33,7 +33,6 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
             sample_true_int = sample_true.astype('uint8')
 
             sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
-            print_log(sample_metrics)
             print_log(f'===== Sample {index}', file=f, file_only=True)
             print_log(sample_metrics, file=f, file_only=True)
 
