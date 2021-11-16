@@ -66,8 +66,9 @@ def export_label(label, path):
     img.save(path)
 
 
-def print_log(*content, file=None, file_path=None):
-    print(*content)
+def print_log(*content, file=None, file_path=None, file_only=False):
+    if not file_only:
+        print(*content)
     if file is not None:
         print(*content, file=file)
     if file_path is not None:

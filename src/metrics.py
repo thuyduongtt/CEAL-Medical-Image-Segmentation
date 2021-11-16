@@ -34,8 +34,8 @@ def validate(model, X_val, y_val, iteration, n_samples, n_labeled_used):
 
             sample_metrics = compute_metrics(sample_true_int, sample_pred_int)
             print_log(sample_metrics)
-            print_log(f'===== Sample {index}', file=f)
-            print_log(sample_metrics, file=f)
+            print_log(f'===== Sample {index}', file=f, file_only=True)
+            print_log(sample_metrics, file=f, file_only=True)
 
             for k in sample_metrics:
                 if k not in metrics:
